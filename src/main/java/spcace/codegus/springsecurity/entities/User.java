@@ -3,9 +3,6 @@ package spcace.codegus.springsecurity.entities;
 import java.util.Set;
 import java.util.UUID;
 
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.ManyToAny;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
