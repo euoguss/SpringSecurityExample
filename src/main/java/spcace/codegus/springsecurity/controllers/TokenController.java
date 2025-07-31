@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nimbusds.jwt.JWTClaimsSet;
 
 import spcace.codegus.springsecurity.controllers.dtos.LoginRequestDTO;
 import spcace.codegus.springsecurity.controllers.dtos.LoginResponseDTO;
