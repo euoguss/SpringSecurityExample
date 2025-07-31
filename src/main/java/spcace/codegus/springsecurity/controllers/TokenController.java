@@ -1,6 +1,7 @@
 package spcace.codegus.springsecurity.controllers;
 
 import java.time.Instant;
+import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import spcace.codegus.springsecurity.controllers.dtos.LoginRequestDTO;
 import spcace.codegus.springsecurity.controllers.dtos.LoginResponseDTO;
+import spcace.codegus.springsecurity.entities.Role;
 import spcace.codegus.springsecurity.repositories.UserRepository;
 
 @RestController
@@ -35,17 +37,25 @@ public class TokenController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO loginRequestDTO){
         var user = userRepository.findByUsername(loginRequestDTO.username());
+        var passwordMatches = passwordEncoder.matches(loginRequestDTO.password(), user.get().getPassword());
 
-        if(user.isEmpty() || !user.get().isLoginCorrect(loginRequestDTO, passwordEncoder)){
+        if(user.isEmpty() || !passwordMatches){
             throw new BadCredentialsException("user or password is invalid!");
         }
         var expiresIn = 300L;
         var now = Instant.now();
+
+        var scope = user.get().getRoles()
+            .stream()
+            .map(Role::getName)
+            .collect(Collectors.joining(" "));
+
         var claims = JwtClaimsSet.builder()
             .issuer("myBacknend")
             .subject(user.get().getUserId().toString())
             .issuedAt(now)
             .expiresAt(now.plusSeconds(expiresIn))
+            .claim("scope", scope)
             .build();
         
         var jwtValue = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
